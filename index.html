@@ -1,77 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Pick Me Up Reader</title>
-  <meta name="description" content="Offline reader for Pick Me Up: Infinite Gacha.">
-
-  <!-- color-scheme + theme-color are updated by app.js to match the active theme -->
-  <meta name="color-scheme" content="dark light">
-  <meta name="theme-color" content="#15171c">
-
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
-
-  <link rel="stylesheet" href="fonts/fonts.css">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <header class="topbar">
-    <button id="sidebar-toggle" class="icon-btn" aria-label="Toggle chapter list" aria-expanded="false">
-      <span class="bars" aria-hidden="true"></span>
-    </button>
-
-    <h1 class="topbar-title">Pick Me Up <span class="topbar-sub">Infinite Gacha</span></h1>
-
-    <div class="controls">
-      <button id="font-dec" class="icon-btn" aria-label="Decrease font size">A&minus;</button>
-      <button id="font-inc" class="icon-btn" aria-label="Increase font size">A&plus;</button>
-      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark and light mode">
-        <span class="theme-icon" aria-hidden="true"></span>
-      </button>
-    </div>
-  </header>
-
-  <div class="app">
-    <!-- Backdrop shown behind the off-canvas sidebar on mobile -->
-    <div id="sidebar-backdrop" class="sidebar-backdrop" hidden></div>
-
-    <aside id="sidebar" class="sidebar" aria-label="Chapter list">
-      <div class="sidebar-head">Chapters</div>
-      <nav>
-        <ul id="chapter-list" class="chapter-list">
-          <li class="chapter-list-loading">Loading chapters...</li>
-        </ul>
-      </nav>
-    </aside>
-
-    <main id="reader" class="reader">
-      <div id="chapter-scroll" class="chapter-scroll">
-        <div id="resume-banner" class="resume-banner" hidden>
-          <span id="resume-text" class="resume-text"></span>
-          <span class="resume-actions">
-            <button id="resume-btn" class="btn">Resume</button>
-            <button id="resume-dismiss" class="icon-btn" aria-label="Dismiss resume prompt">&times;</button>
-          </span>
-        </div>
-
-        <article id="chapter-content" class="chapter-content">
-          <!-- Rendered Markdown is injected here -->
-        </article>
-      </div>
-
-      <footer class="reader-nav">
-        <button id="prev-btn" class="btn nav-btn" aria-label="Previous chapter">&larr; Prev</button>
-        <span id="chapter-indicator" class="chapter-indicator"></span>
-        <button id="next-btn" class="btn nav-btn" aria-label="Next chapter">Next &rarr;</button>
-      </footer>
-    </main>
-  </div>
-
-  <!-- Vendored locally so first load works offline; never a CDN at runtime -->
-  <script src="vendor/marked.min.js"></script>
-  <script src="app.js" defer></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Offline reader for Pick Me Up: Infinite Gacha." />
+    <link rel="icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#15171c" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Pick Me Up Reader</title>
+    <!--
+      Apply the saved theme and font size before first paint so there is no
+      flash of the wrong theme while React boots. React takes over after mount.
+    -->
+    <script>
+      (function () {
+        try {
+          var t =
+            localStorage.getItem("pmu.theme") ||
+            (window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
+          document.documentElement.dataset.theme = t;
+          var f = parseFloat(localStorage.getItem("pmu.fontScale"));
+          if (!isNaN(f)) {
+            document.documentElement.style.setProperty("--font-scale", String(f));
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

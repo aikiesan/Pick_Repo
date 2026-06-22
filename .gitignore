@@ -1,8 +1,13 @@
+# Node / Vite
+node_modules/
+dist/
+*.local
+
 # Python
 __pycache__/
 *.pyc
 
-# Deploy staging (created by the GitHub Actions workflow)
+# Deploy staging (legacy vanilla workflow)
 _site/
 
 # Local tooling

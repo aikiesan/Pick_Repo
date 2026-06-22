@@ -1,10 +1,9 @@
 name: Deploy to GitHub Pages
 
-# Builds and deploys the static reader to GitHub Pages on every push to main.
-# There is no real build step (vanilla HTML/JS/CSS); the workflow just
-# regenerates chapters_index.json as a safety net so the index is always fresh
-# even if it was not regenerated locally, then publishes a clean copy of the
-# static files.
+# Builds the Vite app and deploys it to GitHub Pages on every push to main.
+# The build's prebuild step (npm run build -> prebuild) regenerates
+# chapters_index.json so the index is always fresh, even if it was not
+# regenerated locally.
 
 on:
   push:
@@ -28,21 +27,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
-      - name: Regenerate chapter index (safety net)
-        run: python generate_index.py
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Stage static site
-        # Copy only what the site needs into _site, leaving out the scraper,
-        # generator scripts, and .git history.
-        run: |
-          mkdir -p _site
-          cp index.html styles.css app.js manifest.json sw.js chapters_index.json _site/
-          cp -r chapters vendor fonts icons _site/
+      - name: Build
+        # prebuild runs generate_index.py, then vite build emits dist/
+        run: npm run build
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -50,7 +51,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: dist
 
   deploy:
     needs: build

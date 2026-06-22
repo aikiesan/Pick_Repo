@@ -1,0 +1,495 @@
+/*
+ * Pick Me Up Reader theme.
+ * All theming via CSS custom properties: dark/light is a single data-theme swap
+ * on <html>, and reading size is the --font-scale variable set by the app.
+ */
+
+:root {
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Lora", Georgia, "Times New Roman", serif;
+
+  --font-scale: 1;
+  --reading-size: calc(1.18rem * var(--font-scale));
+
+  --topbar-h: 58px;
+  --sidebar-w: 312px;
+  --reading-measure: 68ch;
+
+  --radius: 10px;
+  --transition: 160ms ease;
+}
+
+:root,
+[data-theme="dark"] {
+  --bg: #15171c;
+  --bg-grad: radial-gradient(1200px 600px at 80% -10%, #1f2530 0%, #15171c 60%);
+  --surface: #1b1e25;
+  --surface-2: #232833;
+  --text: #e7e8ea;
+  --muted: #99a0aa;
+  --accent: #e0a85e;
+  --accent-2: #d98b46;
+  --accent-contrast: #1a1207;
+  --border: #2a2f3a;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+  --bg: #faf7f0;
+  --bg-grad: radial-gradient(1200px 600px at 80% -10%, #fffdf8 0%, #f4efe4 60%);
+  --surface: #fffdf9;
+  --surface-2: #f1ece0;
+  --text: #2b2a27;
+  --muted: #6c685f;
+  --accent: #b5793a;
+  --accent-2: #9c6730;
+  --accent-contrast: #ffffff;
+  --border: #e6dfd0;
+  --shadow: rgba(60, 50, 30, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-grad);
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--topbar-h);
+  padding: 0 16px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 40;
+}
+
+.topbar-title {
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-sub {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.controls {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.icon-btn {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-width: 40px;
+  height: 40px;
+  padding: 0 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--transition), background var(--transition),
+    transform var(--transition);
+}
+.icon-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.icon-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.bars,
+.bars::before,
+.bars::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--text);
+  position: relative;
+  border-radius: 2px;
+}
+.bars::before,
+.bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+.bars::before {
+  top: -6px;
+}
+.bars::after {
+  top: 6px;
+}
+
+.theme-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: inset -5px -3px 0 0 var(--surface-2);
+}
+[data-theme="light"] .theme-icon {
+  background: transparent;
+  box-shadow: 0 0 0 2px var(--text);
+}
+
+.sidebar-toggle {
+  display: none;
+}
+
+/* ---------- Body layout ---------- */
+.body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebar-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-head > span {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.sidebar-search {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 11px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.sidebar-search:focus {
+  border-color: var(--accent);
+}
+
+.chapter-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.chapter-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  padding: 9px 11px;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.chapter-link:hover {
+  background: var(--surface-2);
+}
+.chapter-link.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--accent-contrast);
+  font-weight: 700;
+}
+
+.chapter-list-empty {
+  color: var(--muted);
+  font-size: 0.88rem;
+  padding: 10px 11px;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+/* ---------- Reader ---------- */
+.reader {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+}
+
+.reading-progress {
+  height: 3px;
+  background: transparent;
+  flex-shrink: 0;
+}
+.reading-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 80ms linear;
+}
+
+.chapter-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: auto;
+}
+
+.chapter-content {
+  max-width: var(--reading-measure);
+  margin: 0 auto;
+  padding: 36px 28px 72px;
+  font-family: var(--font-body);
+  font-size: var(--reading-size);
+  line-height: 1.78;
+  animation: fade-in 280ms ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chapter-content h1 {
+  font-size: calc(1.9rem * var(--font-scale));
+  line-height: 1.2;
+  font-weight: 700;
+  margin: 0 0 0.2em;
+  letter-spacing: -0.01em;
+}
+.chapter-content h1::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin-top: 0.5rem;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.chapter-content h2,
+.chapter-content h3 {
+  font-size: calc(1.32rem * var(--font-scale));
+  margin: 1.5em 0 0.5em;
+}
+
+.chapter-content p {
+  margin: 0 0 1.1em;
+}
+
+.chapter-content ol,
+.chapter-content ul {
+  margin: 0 0 1.1em;
+  padding-left: 1.4em;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.chapter-loading,
+.chapter-error {
+  font-family: var(--font-ui);
+  color: var(--muted);
+  text-align: center;
+  margin-top: 12vh;
+}
+.chapter-error {
+  color: var(--accent);
+}
+
+/* ---------- Welcome ---------- */
+.welcome {
+  max-width: 520px;
+  margin: 14vh auto 0;
+  text-align: center;
+  padding: 0 24px;
+}
+.welcome-mark {
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 12px 30px var(--shadow);
+  position: relative;
+}
+.welcome-mark::before {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border-left: 3px solid var(--accent-contrast);
+  opacity: 0.65;
+}
+.welcome h2 {
+  font-family: var(--font-body);
+  font-size: 2.1rem;
+  margin: 0 0 0.2em;
+}
+.welcome-sub {
+  color: var(--muted);
+  margin: 0 0 1.6em;
+}
+.welcome-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---------- Buttons / bottom nav ---------- */
+.reader-nav {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: border-color var(--transition), transform var(--transition),
+    background var(--transition);
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--accent-contrast);
+  border-color: transparent;
+}
+
+.chapter-indicator {
+  flex: 1;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  .sidebar-toggle {
+    display: inline-flex;
+  }
+  .topbar-sub {
+    display: none;
+  }
+
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 30;
+    transform: translateX(-100%);
+    transition: transform 0.24s ease;
+    box-shadow: 2px 0 24px var(--shadow);
+  }
+  .sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+  .sidebar-open .sidebar-backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .chapter-content {
+    padding: 28px 20px 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter-content {
+    animation: none;
+  }
+  .sidebar {
+    transition: none;
+  }
+}

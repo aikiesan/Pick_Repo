@@ -1,79 +1,88 @@
 # Pick Me Up Reader
 
-A static, installable Progressive Web App for reading the *Pick Me Up: Infinite Gacha*
-light novel fully offline. No backend, no framework, no build step. It is deployed
-to GitHub Pages and works offline once installed.
+An installable, offline-first reader for the *Pick Me Up: Infinite Gacha* light
+novel, built with React + Vite and deployed to GitHub Pages. Once visited, it
+works fully offline: the service worker precaches the app and every chapter.
 
 Live site: https://aikiesan.github.io/Pick_Repo/
 
-## How it works
+## Tech
 
-- `chapters/` holds the chapter Markdown files (`001_Chapter_1.md` ... `400_Chapter_400.md`).
-- `generate_index.py` scans `chapters/` and writes `chapters_index.json`, the list the app loads first.
-- `index.html` + `styles.css` + `app.js` are the reader. Chapters are fetched on demand and rendered with a locally vendored copy of `marked.js`.
-- `sw.js` is a service worker that precaches the whole app (shell, fonts, marked, every chapter) so it works offline.
-- Fonts (Lora for prose, Inter for UI) are self-hosted in `fonts/`. Nothing loads from a CDN at runtime.
+- React 18 + TypeScript + Vite (bundled build, deployed as static files).
+- `react-markdown` + `remark-gfm` for chapter rendering.
+- `vite-plugin-pwa` (Workbox) for the manifest and offline service worker.
+- Self-hosted Lora (prose) and Inter (UI) fonts; nothing loads from a CDN.
+
+## Project layout
+
+```
+public/chapters/         the chapter Markdown files (NNN_Chapter_N.md)
+public/chapters_index.json   generated index the app loads first
+public/icons/            generated PWA icons
+src/                     React app (components, hooks, lib, styles)
+src/assets/fonts/        self-hosted woff2 fonts
+generate_index.py        scans public/chapters and writes the index
+generate_icons.py        regenerates placeholder PWA icons (needs Pillow)
+scraper.py               existing scraper (writes into public/chapters)
+vite.config.ts           build config (base path + PWA)
+```
 
 ## Features
 
-- Sidebar chapter list, collapsible on mobile.
+- Sidebar chapter list with a filter box, collapsible on mobile.
 - Previous / Next buttons and ArrowLeft / ArrowRight keyboard shortcuts.
-- URL hash routing (`#/chapter/42`) so links and refresh keep your place.
-- Reading position memory with a resume prompt on reopen.
-- Dark / light theme (defaults to your OS setting) and font size controls, both persisted.
+- Hash routing (`#/chapter/42`) so links and refresh keep your place.
+- Resume on reopen, with per-chapter scroll position remembered.
+- Dark / light theme (defaults to your OS) and font size controls, both persisted.
+- Reading progress bar.
 
-## Recurring maintenance (READ THIS WHEN YOU ADD CHAPTERS)
+## Develop
 
-Every time you add or change any content or code, do BOTH of these:
+```
+npm install
+npm run dev      # http://localhost:5180/
+```
 
-1. Regenerate the index:
+## Build and preview the production bundle
+
+```
+npm run build    # regenerates the index, then builds to dist/
+npm run preview  # serves the built site at http://localhost:4173/Pick_Repo/
+```
+
+To verify offline: open the preview, then in DevTools go to the Application tab,
+tick "Offline" under Service Workers, and reload. The app and all chapters still
+load. A Lighthouse PWA audit should pass installability.
+
+## Adding or updating chapters
+
+1. Run the scraper (it writes into `public/chapters/`), or drop new
+   `NNN_Chapter_N.md` files there.
+2. Regenerate the index (the build also does this automatically):
    ```
    python generate_index.py
    ```
-2. Bump the cache version in `sw.js`:
-   ```
-   const CACHE_NAME = "reader-v1";   // -> "reader-v2", then "reader-v3", ...
-   ```
 
-Why step 2 matters: the service worker is cache-first, so returning visitors keep
-seeing the OLD cached files until `CACHE_NAME` changes. Bumping it makes the new
-service worker precache the new version and delete the old cache on activation.
-If you skip it, readers will not see your new chapters. This is the single most
-common source of bugs in this kind of app, so it is worth turning into a habit.
-
-The deploy workflow runs `generate_index.py` for you automatically, but it cannot
-guess when to bump `CACHE_NAME`, so that step is on you.
-
-## Run locally
-
-A service worker and `fetch()` need http (not the `file://` protocol), so serve
-the folder rather than opening `index.html` directly:
-
-```
-python -m http.server 8000
-```
-
-Then open http://localhost:8000/.
-
-To test offline: open DevTools, go to the Application tab, tick "Offline" under
-Service Workers, and reload. The app and all chapters should still load.
+No manual cache-version bumping is needed: Vite fingerprints every file and the
+service worker (registerType `autoUpdate`) revisions the precache by content
+hash, so returning readers get new chapters on their next visit automatically.
 
 ## Regenerate placeholder icons (optional)
-
-The icons in `icons/` are simple generated placeholders. To regenerate them:
 
 ```
 pip install pillow
 python generate_icons.py
 ```
 
-To use your own artwork instead, just replace the PNGs in `icons/` with files of
-the same names and sizes.
+Or replace the PNGs in `public/icons/` with your own artwork using the same
+filenames and sizes.
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which regenerates the
-index, stages the static files, and publishes to GitHub Pages.
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which installs
+dependencies, regenerates the index, builds with Vite, and publishes `dist/` to
+GitHub Pages.
 
-One-time setup: in the repository settings, under Pages, set the build and
-deployment source to "GitHub Actions".
+One-time setup: in the repository settings, under Pages, set the source to
+"GitHub Actions". The site is served under the `/Pick_Repo/` base path, which is
+configured in `vite.config.ts` (change it there if the repository is renamed).

@@ -87,7 +87,7 @@ def main():
     # Settings
     start_chapter = 1
     end_chapter = 400
-    output_dir = "chapters"
+    output_dir = os.path.join("public", "chapters")
     
     # Create the output directory if it doesn't exist
     if not os.path.exists(output_dir):

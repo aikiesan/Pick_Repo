@@ -32,8 +32,11 @@ from pathlib import Path
 # Resolve paths relative to this script so it works from any working directory
 # (local shell or the GitHub Actions runner).
 ROOT = Path(__file__).resolve().parent
-CHAPTERS_DIR = ROOT / "chapters"
-OUTPUT_FILE = ROOT / "chapters_index.json"
+# Chapters and the generated index live under public/ so Vite serves them as
+# static assets (and the PWA plugin precaches them for offline use).
+PUBLIC_DIR = ROOT / "public"
+CHAPTERS_DIR = PUBLIC_DIR / "chapters"
+OUTPUT_FILE = PUBLIC_DIR / "chapters_index.json"
 
 # Filename pattern: NNN_Some_Title.md  (zero-padded numeric prefix + slug)
 FILENAME_RE = re.compile(r"^(\d+)_(.*)\.md$")

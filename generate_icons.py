@@ -26,7 +26,8 @@ except ImportError:
     sys.exit(1)
 
 ROOT = Path(__file__).resolve().parent
-ICONS_DIR = ROOT / "icons"
+# Icons live under public/ so Vite serves them and the manifest can reference them.
+ICONS_DIR = ROOT / "public" / "icons"
 
 # Match the dark theme in styles.css / manifest.json
 BG = (21, 23, 28, 255)        # #15171c
@@ -69,7 +70,7 @@ def draw_icon(size, inset_frac):
 
 
 def save(img, name, opaque=False):
-    ICONS_DIR.mkdir(exist_ok=True)
+    ICONS_DIR.mkdir(parents=True, exist_ok=True)
     out = img.convert("RGB") if opaque else img
     path = ICONS_DIR / name
     out.save(path, format="PNG")
