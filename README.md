@@ -86,4 +86,3 @@ GitHub Pages.
 One-time setup: in the repository settings, under Pages, set the source to
 "GitHub Actions". The site is served under the `/Pick_Repo/` base path, which is
 configured in `vite.config.ts` (change it there if the repository is renamed).
-```

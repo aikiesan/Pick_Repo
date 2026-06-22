@@ -1,0 +1,45 @@
+/*
+ * Self-hosted fonts for true offline use.
+ * No Google Fonts CDN: every file here is vendored in the repo and precached
+ * by the service worker. Relative url() paths keep this portable on GitHub Pages.
+ * font-display: swap renders system-font fallback first, then swaps when ready.
+ */
+
+/* Lora: body / reading text */
+@font-face {
+  font-family: "Lora";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./lora-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Lora";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./lora-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Lora";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./lora-700.woff2") format("woff2");
+}
+
+/* Inter: UI chrome */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./inter-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./inter-600.woff2") format("woff2");
+}
