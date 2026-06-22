@@ -1,0 +1,400 @@
+/*
+ * Pick Me Up Reader styles.
+ * Theming is done entirely with CSS custom properties so dark/light is a single
+ * data-theme attribute swap on <html>, and font size is a single --font-scale
+ * variable (set by app.js, never inline styles).
+ */
+
+:root {
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Lora", Georgia, "Times New Roman", serif;
+
+  /* Reading text scales from this base via the font - / + controls */
+  --font-scale: 1;
+  --reading-size: calc(1.15rem * var(--font-scale));
+
+  --topbar-h: 56px;
+  --sidebar-w: 300px;
+  --reading-measure: 70ch;
+}
+
+/* Dark is the default theme (matches manifest + theme-color) */
+:root,
+[data-theme="dark"] {
+  --bg: #15171c;
+  --surface: #1d2027;
+  --surface-2: #232730;
+  --text: #e7e8ea;
+  --muted: #9aa0a8;
+  --accent: #d9a05b;
+  --accent-contrast: #1a1207;
+  --border: #2a2e36;
+  --shadow: rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] {
+  --bg: #faf7f0;
+  --surface: #ffffff;
+  --surface-2: #f1ece1;
+  --text: #2b2a27;
+  --muted: #6c685f;
+  --accent: #b5793a;
+  --accent-contrast: #ffffff;
+  --border: #e4ddcf;
+  --shadow: rgba(60, 50, 30, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  overflow: hidden; /* the chapter scroll area handles scrolling */
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--topbar-h);
+  padding: 0 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-sub {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.controls {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.icon-btn {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:hover {
+  border-color: var(--accent);
+}
+
+/* Hamburger icon drawn with a single span + pseudo-elements */
+.bars,
+.bars::before,
+.bars::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--text);
+  position: relative;
+}
+.bars::before,
+.bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+.bars::before { top: -6px; }
+.bars::after { top: 6px; }
+
+/* Theme icon: a moon in dark mode, a sun-ish dot in light mode */
+.theme-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: inset -5px -3px 0 0 var(--surface-2);
+}
+[data-theme="light"] .theme-icon {
+  box-shadow: 0 0 0 2px var(--text);
+  background: transparent;
+}
+
+#sidebar-toggle {
+  display: none; /* shown only on mobile */
+}
+
+/* ---------- Layout ---------- */
+.app {
+  flex: 1;
+  display: flex;
+  min-height: 0; /* allow children to scroll instead of growing the page */
+  position: relative;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-head {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 14px 16px 8px;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+
+.chapter-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 8px 16px;
+}
+
+.chapter-list-loading {
+  color: var(--muted);
+  padding: 8px 8px;
+  font-size: 0.9rem;
+}
+
+.chapter-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.chapter-link:hover {
+  background: var(--surface-2);
+}
+
+.chapter-link.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+/* ---------- Reader ---------- */
+.reader {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chapter-scroll {
+  flex: 1;
+  overflow-y: auto;
+  /* Instant jumps: chapter changes and scroll-position restore should not animate */
+  scroll-behavior: auto;
+}
+
+.chapter-content {
+  max-width: var(--reading-measure);
+  margin: 0 auto;
+  padding: 28px 24px 64px;
+  font-family: var(--font-body);
+  font-size: var(--reading-size);
+  line-height: 1.75;
+}
+
+.chapter-content h1 {
+  font-size: calc(1.7rem * var(--font-scale));
+  line-height: 1.25;
+  margin: 0 0 0.8em;
+  font-weight: 700;
+}
+
+.chapter-content h2,
+.chapter-content h3 {
+  font-size: calc(1.3rem * var(--font-scale));
+  margin: 1.4em 0 0.5em;
+}
+
+.chapter-content p {
+  margin: 0 0 1.05em;
+}
+
+.chapter-content ol,
+.chapter-content ul {
+  margin: 0 0 1.05em;
+  padding-left: 1.4em;
+}
+
+/* Welcome / empty state */
+.welcome {
+  text-align: center;
+  color: var(--muted);
+  margin-top: 12vh;
+}
+.welcome h2 {
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+.chapter-error {
+  color: var(--accent);
+  font-family: var(--font-ui);
+}
+
+/* ---------- Resume banner ---------- */
+.resume-banner {
+  max-width: var(--reading-measure);
+  margin: 16px auto 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+}
+
+.resume-text {
+  flex: 1;
+}
+
+.resume-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Bottom navigation ---------- */
+.reader-nav {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#resume-btn {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+}
+
+.chapter-indicator {
+  flex: 1;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  #sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .topbar-sub {
+    display: none;
+  }
+
+  /* Sidebar becomes an off-canvas drawer */
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 30;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: 2px 0 16px var(--shadow);
+  }
+
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}
