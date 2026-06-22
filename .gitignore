@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Deploy staging (created by the GitHub Actions workflow)
+_site/
+
+# Local tooling
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
