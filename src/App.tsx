@@ -18,6 +18,50 @@ export default function App() {
   const font = useFontScale();
   const { chapterNum, goToChapter } = useHashChapter();
 
+  // Font family toggle (Serif vs Sans)
+  const [fontFamily, setFontFamily] = useState<"serif" | "sans">(() => {
+    try {
+      return (localStorage.getItem("pmu.fontFamily") as "serif" | "sans") || "serif";
+    } catch {
+      return "serif";
+    }
+  });
+
+  const toggleFontFamily = useCallback(() => {
+    setFontFamily((prev) => {
+      const next = prev === "serif" ? "sans" : "serif";
+      try {
+        localStorage.setItem("pmu.fontFamily", next);
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.font = fontFamily;
+  }, [fontFamily]);
+
+  // Read chapters tracking
+  const [readChapters, setReadChapters] = useState<number[]>(() => {
+    try {
+      const saved = localStorage.getItem("pmu.read");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const markAsRead = useCallback((num: number) => {
+    setReadChapters((prev) => {
+      if (prev.includes(num)) return prev;
+      const next = [...prev, num];
+      try {
+        localStorage.setItem("pmu.read", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
   // Load the chapter index once.
   useEffect(() => {
     let cancelled = false;
@@ -93,6 +137,8 @@ export default function App() {
         onFontDec={font.decrease}
         canFontInc={font.canIncrease}
         canFontDec={font.canDecrease}
+        fontFamily={fontFamily}
+        onToggleFontFamily={toggleFontFamily}
       />
 
       <div className="body">
@@ -105,6 +151,7 @@ export default function App() {
           chapters={chapters}
           currentNum={current ? current.num : null}
           onSelect={navigate}
+          readChapters={readChapters}
         />
 
         {loadError ? (
@@ -122,6 +169,7 @@ export default function App() {
             prevNum={prevNum}
             nextNum={nextNum}
             onNavigate={navigate}
+            onMarkAsRead={markAsRead}
           />
         ) : (
           <Home

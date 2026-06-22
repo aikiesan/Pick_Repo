@@ -657,3 +657,54 @@ body {
     animation: none;
   }
 }
+
+/* Font Family Customization */
+[data-font="sans"] {
+  --font-body: var(--font-ui);
+}
+
+.font-family-btn {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+.font-family-serif {
+  font-family: var(--font-body) !important;
+}
+.font-family-sans {
+  font-family: var(--font-ui) !important;
+}
+
+/* Sidebar Chapter Layout & Read Badge */
+.chapter-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.chapter-title-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.read-badge {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 900;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-radius: 50%;
+  line-height: 1;
+  padding-bottom: 1px;
+}
+.chapter-link.active .read-badge {
+  color: var(--accent-contrast);
+  background: color-mix(in srgb, var(--accent-contrast) 25%, transparent);
+}

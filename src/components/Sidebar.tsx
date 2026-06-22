@@ -5,9 +5,10 @@ interface SidebarProps {
   chapters: Chapter[];
   currentNum: number | null;
   onSelect: (num: number) => void;
+  readChapters: number[];
 }
 
-export function Sidebar({ chapters, currentNum, onSelect }: SidebarProps) {
+export function Sidebar({ chapters, currentNum, onSelect, readChapters }: SidebarProps) {
   const [query, setQuery] = useState("");
   const activeRef = useRef<HTMLButtonElement | null>(null);
 
@@ -43,6 +44,7 @@ export function Sidebar({ chapters, currentNum, onSelect }: SidebarProps) {
         <ul className="chapter-list">
           {filtered.map((c) => {
             const active = c.num === currentNum;
+            const isRead = readChapters.includes(c.num);
             return (
               <li key={c.num}>
                 <button
@@ -51,7 +53,12 @@ export function Sidebar({ chapters, currentNum, onSelect }: SidebarProps) {
                   onClick={() => onSelect(c.num)}
                   aria-current={active ? "true" : undefined}
                 >
-                  {c.title}
+                  <span className="chapter-title-text">{c.title}</span>
+                  {isRead && (
+                    <span className="read-badge" title="Read">
+                      ✓
+                    </span>
+                  )}
                 </button>
               </li>
             );

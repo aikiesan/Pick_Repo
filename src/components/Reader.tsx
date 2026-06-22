@@ -11,6 +11,7 @@ interface ReaderProps {
   prevNum: number | null;
   nextNum: number | null;
   onNavigate: (num: number) => void;
+  onMarkAsRead: (num: number) => void;
 }
 
 function applyRatio(el: HTMLElement, ratio: number): void {
@@ -18,7 +19,14 @@ function applyRatio(el: HTMLElement, ratio: number): void {
   el.scrollTop = max > 0 ? ratio * max : 0;
 }
 
-export function Reader({ chapter, total, prevNum, nextNum, onNavigate }: ReaderProps) {
+export function Reader({
+  chapter,
+  total,
+  prevNum,
+  nextNum,
+  onNavigate,
+  onMarkAsRead,
+}: ReaderProps) {
   const [text, setText] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -71,6 +79,12 @@ export function Reader({ chapter, total, prevNum, nextNum, onNavigate }: ReaderP
     if (progressRef.current) {
       progressRef.current.style.width = (ratio * 100).toFixed(1) + "%";
     }
+
+    // Mark chapter as read when scrolled past 92% of the content
+    if (ratio > 0.92) {
+      onMarkAsRead(chapter.num);
+    }
+
     window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(
       () => savePosition({ num: chapter.num, ratio }),
