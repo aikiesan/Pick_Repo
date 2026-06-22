@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#15171c" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Pick Me Up Reader</title>
+    <!--
+      Apply the saved theme and font size before first paint so there is no
+      flash of the wrong theme while React boots. React takes over after mount.
+    -->
+    <script>
+      (function () {
+        try {
+          var t =
+            localStorage.getItem("pmu.theme") ||
+            (window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
+          document.documentElement.dataset.theme = t;
+          var f = parseFloat(localStorage.getItem("pmu.fontScale"));
+          if (!isNaN(f)) {
+            document.documentElement.style.setProperty("--font-scale", String(f));
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
