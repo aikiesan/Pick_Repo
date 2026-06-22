@@ -1,7 +1,9 @@
 # Chapter 2
 
+
 # 2
 2. Found
+
 I opened the front door.
 The cold air seeped into his nose.
 ‘Why is it colder inside than outside?’
@@ -170,3 +172,4 @@ The power didn’t turn off. ‘You Lose’ still pops up. The boss at the back 
 The part of the boss’ mouth that was crushed into a mosaic seemed to be whispering something.
 「I found it.」
 Then, my consciousness fell.
+

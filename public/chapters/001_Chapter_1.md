@@ -1,7 +1,9 @@
 # Chapter 1
 
+
 # 1
 1. An article on a webzine
+
 There is a game called Pick me up.
 It is a mobile game launched by Mobius Co., Ltd. two years ago and has a subtitle called Hyper Roguelike Summoning RPG.
 Today, in celebration of the 2nd anniversary of Pick Me Up and the 100 million DL breakthrough, I am writing a glorious special article. I wish you well.
@@ -123,3 +125,4 @@ Empathize 13 Dislike 11
 – All High Loki!
 All roads lead to Loki!
 … (abridged).
+
