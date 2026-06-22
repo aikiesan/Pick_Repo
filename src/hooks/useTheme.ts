@@ -6,7 +6,7 @@ const KEY = "pmu.theme";
 function currentTheme(): Theme {
   // The inline script in index.html has already set data-theme before paint.
   const attr = document.documentElement.dataset.theme;
-  return attr === "light" ? "light" : "dark";
+  return attr === "light" ? "light" : attr === "sepia" ? "sepia" : "dark";
 }
 
 function applyTheme(theme: Theme): void {
@@ -26,7 +26,11 @@ export function useTheme(): [Theme, () => void] {
 
   const toggle = useCallback(() => {
     setTheme((prev) => {
-      const next: Theme = prev === "dark" ? "light" : "dark";
+      let next: Theme;
+      if (prev === "dark") next = "light";
+      else if (prev === "light") next = "sepia";
+      else next = "dark";
+      
       applyTheme(next);
       try {
         localStorage.setItem(KEY, next);
