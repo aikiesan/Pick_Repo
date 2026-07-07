@@ -1,3 +1,5 @@
+import { fetchWithCacheFallback } from "./offline";
+
 // Normalizes a scraped chapter's Markdown for display.
 //
 // The scraped chapters store one sentence per line with no blank line between
@@ -25,8 +27,10 @@ export async function loadChapterMarkdown(
   if (cached !== undefined) return cached;
 
   const url = import.meta.env.BASE_URL + file;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to load chapter ${num}: HTTP ${res.status}`);
+  // Network first, then any cache (service-worker precache or the explicit
+  // offline download cache), so a chapter saved by either mechanism opens
+  // offline even if the service worker is not controlling the page.
+  const res = await fetchWithCacheFallback(url);
   const processed = normalizeChapterMarkdown(await res.text());
   cache.set(num, processed);
   return processed;

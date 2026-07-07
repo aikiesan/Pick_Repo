@@ -7,6 +7,7 @@ import { useTheme } from "./hooks/useTheme";
 import { useFontScale } from "./hooks/useFontScale";
 import { useHashChapter } from "./hooks/useHashChapter";
 import { loadPosition } from "./lib/position";
+import { fetchWithCacheFallback, requestPersistentStorage } from "./lib/offline";
 import type { Chapter } from "./types";
 
 export default function App() {
@@ -17,6 +18,11 @@ export default function App() {
   const [theme, toggleTheme] = useTheme();
   const font = useFontScale();
   const { chapterNum, goToChapter } = useHashChapter();
+
+  // Ask the browser to protect our caches from eviction (best-effort).
+  useEffect(() => {
+    requestPersistentStorage();
+  }, []);
 
   // Font family toggle (Serif vs Sans)
   const [fontFamily, setFontFamily] = useState<"serif" | "sans">(() => {
@@ -62,14 +68,12 @@ export default function App() {
     });
   }, []);
 
-  // Load the chapter index once.
+  // Load the chapter index once. fetchWithCacheFallback keeps the app working
+  // offline even when the service worker is not (yet) controlling the page.
   useEffect(() => {
     let cancelled = false;
-    fetch(import.meta.env.BASE_URL + "chapters_index.json")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
+    fetchWithCacheFallback(import.meta.env.BASE_URL + "chapters_index.json")
+      .then((res) => res.json())
       .then((data: Chapter[]) => {
         if (cancelled) return;
         data.sort((a, b) => a.num - b.num);
@@ -175,6 +179,7 @@ export default function App() {
           <Home
             resumeNum={resumeNum}
             hasChapters={chapters.length > 0}
+            chapters={chapters}
             onResume={() => resumeNum != null && navigate(resumeNum)}
             onStart={() => chapters.length > 0 && navigate(chapters[0].num)}
           />

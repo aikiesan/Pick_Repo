@@ -35,6 +35,11 @@ vite.config.ts           build config (base path + PWA)
 - Resume on reopen, with per-chapter scroll position remembered.
 - Dark / light theme (defaults to your OS) and font size controls, both persisted.
 - Reading progress bar.
+- Offline download manager on the home screen: shows how many chapters are
+  saved on the device ("N / 400"), with a "Download all chapters" button that
+  fetches the rest with visible progress and per-file retries. Reads fall back
+  to the cache when the network is unavailable, so chapters stay readable even
+  if the service worker failed to install (e.g. a flaky first visit on mobile).
 
 ## Develop
 

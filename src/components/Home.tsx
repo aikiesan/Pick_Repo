@@ -1,11 +1,15 @@
+import type { Chapter } from "../types";
+import { OfflineManager } from "./OfflineManager";
+
 interface HomeProps {
   resumeNum: number | null;
   onResume: () => void;
   onStart: () => void;
   hasChapters: boolean;
+  chapters: Chapter[];
 }
 
-export function Home({ resumeNum, onResume, onStart, hasChapters }: HomeProps) {
+export function Home({ resumeNum, onResume, onStart, hasChapters, chapters }: HomeProps) {
   return (
     <main className="reader">
       <div className="chapter-scroll">
@@ -45,6 +49,8 @@ export function Home({ resumeNum, onResume, onStart, hasChapters }: HomeProps) {
           ) : (
             <p className="welcome-sub">Loading chapters...</p>
           )}
+
+          <OfflineManager chapters={chapters} />
         </div>
       </div>
     </main>
