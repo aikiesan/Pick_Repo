@@ -2,11 +2,12 @@ import { useCallback, useState } from "react";
 import type { Theme } from "../types";
 
 const KEY = "pmu.theme";
+const ORDER: Theme[] = ["dark", "black", "light", "sepia"];
 
 function currentTheme(): Theme {
   // The inline script in index.html has already set data-theme before paint.
-  const attr = document.documentElement.dataset.theme;
-  return attr === "light" ? "light" : attr === "sepia" ? "sepia" : "dark";
+  const attr = document.documentElement.dataset.theme as Theme | undefined;
+  return attr && ORDER.includes(attr) ? attr : "dark";
 }
 
 function applyTheme(theme: Theme): void {
@@ -21,16 +22,22 @@ function applyTheme(theme: Theme): void {
   }
 }
 
-export function useTheme(): [Theme, () => void] {
-  const [theme, setTheme] = useState<Theme>(currentTheme);
+export function useTheme(): [Theme, () => void, (t: Theme) => void] {
+  const [theme, setThemeState] = useState<Theme>(currentTheme);
+
+  const set = useCallback((next: Theme) => {
+    applyTheme(next);
+    try {
+      localStorage.setItem(KEY, next);
+    } catch {
+      /* ignore */
+    }
+    setThemeState(next);
+  }, []);
 
   const toggle = useCallback(() => {
-    setTheme((prev) => {
-      let next: Theme;
-      if (prev === "dark") next = "light";
-      else if (prev === "light") next = "sepia";
-      else next = "dark";
-      
+    setThemeState((prev) => {
+      const next = ORDER[(ORDER.indexOf(prev) + 1) % ORDER.length];
       applyTheme(next);
       try {
         localStorage.setItem(KEY, next);
@@ -41,5 +48,5 @@ export function useTheme(): [Theme, () => void] {
     });
   }, []);
 
-  return [theme, toggle];
+  return [theme, toggle, set];
 }
