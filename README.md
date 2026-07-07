@@ -29,8 +29,15 @@ vite.config.ts           build config (base path + PWA)
 
 ## Features
 
-- Sidebar chapter list with a filter box, collapsible on mobile.
-- Previous / Next buttons and ArrowLeft / ArrowRight keyboard shortcuts.
+- Sidebar chapter list with a filter box, collapsible on mobile, plus a
+  Bookmarks tab: bookmark your exact spot from the top bar (select text first
+  to save it as a quote), reopen or delete bookmarks from the sidebar.
+- Previous / Next buttons, ArrowLeft / ArrowRight keyboard shortcuts, tap the
+  left / right page edge on touch screens (toggleable), and a "Continue to
+  Chapter N" button at the end of each chapter.
+- "Aa" reading settings menu: font size, serif/sans, theme (dark, true-black
+  OLED, light, sepia), line spacing, text width, keep-screen-on (wake lock),
+  and the edge-tap toggle. All persisted.
 - Hash routing (`#/chapter/42`) so links and refresh keep your place.
 - Resume on reopen, with per-chapter scroll position remembered.
 - Dark / light theme (defaults to your OS) and font size controls, both persisted.

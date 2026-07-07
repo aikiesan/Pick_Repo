@@ -14,6 +14,7 @@
   --topbar-h: 64px;
   --sidebar-w: 320px;
   --reading-measure: 68ch;
+  --line-height: 1.85;
 
   --radius: 12px;
   --radius-sm: 8px;
@@ -37,6 +38,45 @@
   --border-focus: #3d4966;
   --shadow: rgba(0, 0, 0, 0.4);
   --shadow-glow: rgba(244, 180, 103, 0.12);
+}
+
+/* True-black theme: pure #000 background for OLED screens (each black pixel is
+   off, which saves battery on a long flight) with muted, low-glare text. */
+[data-theme="black"] {
+  --bg: #000000;
+  --bg-grad: #000000;
+  --surface: #0a0a0c;
+  --surface-2: #131318;
+  --surface-3: #1d1d24;
+  --text: #d8dbe2;
+  --text-body: #c9ccd4;
+  --muted: #6f7686;
+  --accent: #e0a75f;
+  --accent-2: #c87f33;
+  --accent-contrast: #150900;
+  --border: #1b1b22;
+  --border-focus: #33333e;
+  --shadow: rgba(0, 0, 0, 0.7);
+  --shadow-glow: rgba(224, 167, 95, 0.1);
+}
+
+/* Warm paper theme for reading in a bright cabin. */
+[data-theme="sepia"] {
+  --bg: #f4ecd8;
+  --bg-grad: radial-gradient(circle at 80% -20%, #faf4e4 0%, #ecdfc3 70%);
+  --surface: #f8f2e2;
+  --surface-2: #ecdfc3;
+  --surface-3: #e0d0ac;
+  --text: #433422;
+  --text-body: #4f3f2c;
+  --muted: #8a7758;
+  --accent: #a05f1c;
+  --accent-2: #7f4a12;
+  --accent-contrast: #fff8ec;
+  --border: #ddcca6;
+  --border-focus: #c3ad81;
+  --shadow: rgba(90, 70, 40, 0.12);
+  --shadow-glow: rgba(160, 95, 28, 0.1);
 }
 
 [data-theme="light"] {
@@ -378,7 +418,7 @@ body {
   font-family: var(--font-body);
   font-size: var(--reading-size);
   color: var(--text-body);
-  line-height: 1.85;
+  line-height: var(--line-height);
   animation: fade-in 350ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -784,4 +824,280 @@ body {
 .chapter-link.active .read-badge {
   color: var(--accent-contrast);
   background: color-mix(in srgb, var(--accent-contrast) 25%, transparent);
+}
+
+/* ---------- Sidebar tabs (Chapters / Bookmarks) ---------- */
+.sidebar-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 6px 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.sidebar-tab:hover {
+  color: var(--text);
+}
+.sidebar-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-badge {
+  font-size: 0.7rem;
+  background: var(--surface-3);
+  color: var(--text);
+  border-radius: 99px;
+  padding: 1px 7px;
+}
+
+/* ---------- Bookmarks list ---------- */
+.bookmark-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.bookmark-item .chapter-link {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.bookmark-where {
+  display: block;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.bookmark-quote {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.bookmark-delete {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
+/* ---------- Reading settings panel ---------- */
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+}
+
+.settings-panel {
+  position: absolute;
+  top: calc(var(--topbar-h) + 8px);
+  right: 12px;
+  z-index: 50;
+  width: min(400px, calc(100vw - 24px));
+  max-height: calc(100dvh - var(--topbar-h) - 24px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px var(--shadow);
+  padding: 6px 18px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.settings-panel > .settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-label {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.settings-label small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.settings-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.settings-value {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 44px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.chip {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 7px 13px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.chip:hover {
+  color: var(--text);
+  border-color: var(--border-focus);
+}
+.chip.selected {
+  color: var(--accent-contrast);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+}
+
+.settings-switch-row {
+  cursor: pointer;
+}
+
+.switch {
+  appearance: none;
+  flex: none;
+  width: 46px;
+  height: 26px;
+  border-radius: 99px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: var(--transition);
+  margin: 0;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: var(--transition);
+}
+.switch:checked {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+}
+.switch:checked::after {
+  left: 22px;
+  background: var(--accent-contrast);
+}
+
+/* ---------- Settings (Aa) topbar button ---------- */
+.settings-btn {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.settings-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------- End-of-chapter navigation ---------- */
+.chapter-end {
+  margin-top: 64px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.chapter-end-next {
+  width: 100%;
+  max-width: 360px;
+  padding: 16px 24px;
+  font-size: 1rem;
+}
+
+.chapter-end-fin {
+  font-family: var(--font-ui);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  top: calc(var(--topbar-h) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-contrast);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 99px;
+  padding: 10px 22px;
+  box-shadow: 0 8px 24px var(--shadow);
+  animation: toast-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }

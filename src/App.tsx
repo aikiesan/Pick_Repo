@@ -1,23 +1,33 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Topbar } from "./components/Topbar";
 import { Sidebar } from "./components/Sidebar";
-import { Reader } from "./components/Reader";
+import { Reader, RESTORE_POSITION_EVENT } from "./components/Reader";
 import { Home } from "./components/Home";
+import { SettingsPanel } from "./components/SettingsPanel";
 import { useTheme } from "./hooks/useTheme";
 import { useFontScale } from "./hooks/useFontScale";
 import { useHashChapter } from "./hooks/useHashChapter";
-import { loadPosition } from "./lib/position";
+import { useReaderSettings } from "./hooks/useReaderSettings";
+import { useWakeLock } from "./hooks/useWakeLock";
+import { loadPosition, savePosition } from "./lib/position";
 import { fetchWithCacheFallback, requestPersistentStorage } from "./lib/offline";
-import type { Chapter } from "./types";
+import { addBookmark, loadBookmarks, removeBookmark } from "./lib/bookmarks";
+import type { Bookmark, Chapter } from "./types";
 
 export default function App() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loadError, setLoadError] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [theme, toggleTheme] = useTheme();
+  const [theme, toggleTheme, setTheme] = useTheme();
   const font = useFontScale();
   const { chapterNum, goToChapter } = useHashChapter();
+  const [settings, updateSetting] = useReaderSettings();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>(loadBookmarks);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useWakeLock(settings.keepAwake);
 
   // Ask the browser to protect our caches from eviction (best-effort).
   useEffect(() => {
@@ -107,6 +117,40 @@ export default function App() {
     [goToChapter],
   );
 
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast(null), 1600);
+  }, []);
+
+  // Bookmark the current reading spot. The Reader throttle-saves the scroll
+  // position to localStorage, so the freshest position for the open chapter is
+  // simply the saved one. Any selected text is kept as a quote.
+  const bookmarkCurrent = useCallback(() => {
+    if (!current) return;
+    const saved = loadPosition();
+    const ratio = saved && saved.num === current.num ? saved.ratio : 0;
+    const quote = window.getSelection()?.toString() ?? undefined;
+    setBookmarks(addBookmark(current.num, ratio, quote));
+    showToast("Bookmarked ✓");
+  }, [current, showToast]);
+
+  const openBookmark = useCallback(
+    (b: Bookmark) => {
+      savePosition({ num: b.num, ratio: b.ratio });
+      if (current?.num === b.num) {
+        window.dispatchEvent(new Event(RESTORE_POSITION_EVENT));
+      } else {
+        goToChapter(b.num);
+      }
+      setSidebarOpen(false);
+    },
+    [current, goToChapter],
+  );
+
+  const deleteBookmark = useCallback((id: number) => {
+    setBookmarks(removeBookmark(id));
+  }, []);
+
   // Keyboard navigation: ArrowLeft / ArrowRight for previous / next chapter.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -137,13 +181,29 @@ export default function App() {
         onToggleSidebar={() => setSidebarOpen((o) => !o)}
         theme={theme}
         onToggleTheme={toggleTheme}
-        onFontInc={font.increase}
-        onFontDec={font.decrease}
-        canFontInc={font.canIncrease}
-        canFontDec={font.canDecrease}
+        canBookmark={!!current}
+        onBookmark={bookmarkCurrent}
+        settingsOpen={settingsOpen}
+        onToggleSettings={() => setSettingsOpen((o) => !o)}
+      />
+
+      <SettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        theme={theme}
+        onSetTheme={setTheme}
+        font={font}
         fontFamily={fontFamily}
         onToggleFontFamily={toggleFontFamily}
+        settings={settings}
+        onUpdate={updateSetting}
       />
+
+      {toast && (
+        <div className="toast" role="status">
+          {toast}
+        </div>
+      )}
 
       <div className="body">
         <div
@@ -156,6 +216,9 @@ export default function App() {
           currentNum={current ? current.num : null}
           onSelect={navigate}
           readChapters={readChapters}
+          bookmarks={bookmarks}
+          onOpenBookmark={openBookmark}
+          onDeleteBookmark={deleteBookmark}
         />
 
         {loadError ? (
@@ -174,6 +237,7 @@ export default function App() {
             nextNum={nextNum}
             onNavigate={navigate}
             onMarkAsRead={markAsRead}
+            edgeTapEnabled={settings.edgeTap}
           />
         ) : (
           <Home
