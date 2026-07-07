@@ -57,6 +57,20 @@ export default defineConfig(({ command, isPreview }) => ({
         // Single-page app: serve the shell for any uncached navigation.
         navigateFallback: "index.html",
         cleanupOutdatedCaches: true,
+        // Belt and braces: if the all-or-nothing precache install failed (one
+        // dropped request on a flaky mobile connection aborts all of it), any
+        // chapter opened online still gets runtime-cached for offline reading.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.endsWith(".md"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "pmu-md-runtime",
+              expiration: { maxEntries: 500 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
 
       // Keep the service worker out of `vite dev` so development is not fighting

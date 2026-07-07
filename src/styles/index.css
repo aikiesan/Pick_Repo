@@ -592,6 +592,76 @@ body {
   filter: brightness(1.08);
 }
 
+/* ---------- Offline download card (home screen) ---------- */
+.offline-card {
+  margin: 34px auto 0;
+  max-width: 420px;
+  text-align: left;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.offline-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.offline-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex: none;
+}
+.offline-dot.ready {
+  background: #3fb950;
+  box-shadow: 0 0 8px rgba(63, 185, 80, 0.6);
+}
+
+.offline-count {
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.offline-bar {
+  height: 6px;
+  margin: 12px 0;
+  border-radius: 3px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.offline-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.25s ease;
+}
+
+.offline-note {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.offline-warn {
+  color: var(--accent-2);
+}
+
+.offline-btn {
+  width: 100%;
+  margin-top: 6px;
+}
+
 .chapter-indicator {
   flex: 1;
   text-align: center;
